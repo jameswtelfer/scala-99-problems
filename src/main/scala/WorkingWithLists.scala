@@ -1,3 +1,5 @@
+import scala.util.Random
+
 object WorkingWithLists {
   def last[T](x: List[T]): T = x.last
 
@@ -58,5 +60,77 @@ object WorkingWithLists {
 
     if (suffix.isEmpty) entry
     else nextElement(suffix, entry)
+  }
+
+  def duplicate[T](x: List[T]): List[T] = duplicateN(2, x)
+
+  def duplicateN[T](count: Int, x: List[T]): List[T] = decode(x.map(i => (count, i)))
+
+  def drop[T](n: Int, x: List[T]): List[T] = {
+    x.sliding(n, n).map { l =>
+      if (l.length == n) l.init
+      else l
+    }.toList.flatten
+  }
+
+  def split[T](n: Int, x: List[T]): (List[T], List[T]) = x.splitAt(n)
+
+  def slice[T](i: Int, k: Int, x: List[T]): List[T] = x.slice(i, k)
+
+  def rotate[T](n: Int, x: List[T]): List[T] = {
+    if (0 < n) {
+      val (l, r) = split(n, x)
+      r ++ l
+    }
+    else if (0 > n) {
+      val (l, r) = split(x.length - (n * -1), x)
+      r ++ l
+    }
+    else x
+  }
+
+  def removeAt[T](n: Int, x: List[T]): (List[T], T) = {
+    val (l, r) = x.splitAt(n + 1)
+
+    (l.init ++ r, l.last)
+  }
+
+  def insertAt[T](t: T, at: Int, x: List[T]): List[T] = {
+    val (l, r) = x.splitAt(at)
+
+    (l :+ t) ++ r
+  }
+
+  def range(start: Int, end: Int): List[Int] = List.range(start, end + 1)
+
+  def randomSelect[T](n: Int, x: List[T]): List[T] = randomSelectRecurse(x, new Random(), n, List.empty)
+
+  private def randomSelectRecurse[T](input: List[T], rnd: Random, count: Int, output: List[T]): List[T] = {
+    if (0 == count) output
+    else {
+      val (remainder, item) = removeAt(rnd.nextInt(input.length), input)
+
+      randomSelectRecurse(remainder, rnd, count - 1, output :+ item)
+    }
+  }
+
+  def lotto(n: Int, m: Int): List[Int] = randomSelect(n, range(1, m))
+
+  def randomPermute[T](x: List[T]): List[T] = randomSelect(x.length, x)
+
+  def combinations[T](n: Int, x: List[T]): List[List[T]] = {
+    combinationsRecurse(n, x)
+  }
+
+  private def combinationsRecurse[T](n: Int, x: List[T]): List[List[T]] = {
+    (n, x) match {
+      case (0, _) => List(Nil)
+      case (_, Nil) => Nil
+      case _ =>
+        val combinationsWithThisValue = combinationsRecurse(n - 1, x.tail).map(x.head :: _)
+        val combinationsWithRemainingElements = combinationsRecurse(n, x.tail)
+
+        combinationsWithThisValue ++ combinationsWithRemainingElements
+    }
   }
 }
