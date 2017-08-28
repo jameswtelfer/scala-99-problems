@@ -1,2 +1,6 @@
+# Scala & SBT files
 *.class
 *.log
+
+# IDEA files
+/.idea/
