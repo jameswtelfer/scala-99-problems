@@ -18,20 +18,27 @@ object WorkingWithLists {
     }
   }
 
-  def compress[T](x: List[T]): List[T] = {
-    x match {
-      case a :: Nil => List(a)
-      case a :: b :: Nil if a == b => List(a)
-      case a :: b :: Nil => List(a, b)
-      case a :: b :: tail if a == b => compress(a +: tail)
-      case a :: b :: tail => a +: compress(b +: tail)
+  def compress[T](x: List[T]): List[T] = compressRecurse(x, List.empty)
+
+  private def compressRecurse[T](input: List[T], output: List[T]): List[T] = {
+    input match {
+      case a :: Nil => output :+ a
+      case a :: b :: Nil if a == b => output :+ a
+      case a :: b :: Nil => output ++ List(a, b)
+      case a :: b :: tail if a == b => compressRecurse(a +: tail, output)
+      case a :: b :: tail => compressRecurse(b +: tail, output :+ a)
     }
   }
 
-  def pack[T](x: List[T]): List[List[T]] = {
-    val (prefix, suffix) = x.span(_ == x.head)
-    if (suffix.isEmpty) List(prefix)
-    else List(prefix) ++ pack(suffix)
+  def pack[T](x: List[T]): List[List[T]] = packRecurse(x, List.empty)
+
+  private def packRecurse[T](input: List[T], output: List[List[T]]): List[List[T]] = {
+    val (prefix, suffix) = input.span(_ == input.head)
+
+    val updatedOutput = output ++ List(prefix)
+
+    if (suffix.isEmpty) updatedOutput
+    else packRecurse(suffix, updatedOutput)
   }
 
   def encode[T](x: List[T]): List[(Int, T)] = pack(x).map(i => (i.length, i.head))
@@ -43,15 +50,13 @@ object WorkingWithLists {
 
   def decode[T](x: List[(Int, T)]): List[T] = x.flatMap(i => List.fill(i._1)(i._2))
 
-  def encodeDirect[T](x: List[T]): List[(Int, T)] = {
-    def nextElement(input: List[T], output: List[(Int, T)]): List[(Int, T)] = {
-      val (prefix, suffix) = input.span(_ == input.head)
-      val entry = output ++ List((prefix.length, prefix.head))
+  def encodeDirect[T](x: List[T]): List[(Int, T)] = nextElement(x, List.empty)
 
-      if (suffix.isEmpty) entry
-      else nextElement(suffix, entry)
-    }
+  private def nextElement[T](input: List[T], output: List[(Int, T)]): List[(Int, T)] = {
+    val (prefix, suffix) = input.span(_ == input.head)
+    val entry = output ++ List((prefix.length, prefix.head))
 
-    nextElement(x, List.empty)
+    if (suffix.isEmpty) entry
+    else nextElement(suffix, entry)
   }
 }
