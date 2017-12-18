@@ -57,4 +57,56 @@ class S99LogicSpec extends FlatSpec with Matchers {
     equ(a = false, b = true) should be(false)
     equ(a = false, b = false) should be(true)
   }
+
+  "class operator and" should "output the correct logic" in {
+    t.and(true) should be(true)
+    t.and(false) should be(false)
+    f.and(true) should be(false)
+    f.and(false) should be(false)
+  }
+
+  "class operator or" should "output the correct logic" in {
+    t.or(true) should be(true)
+    t.or(false) should be(true)
+    f.or(true) should be(true)
+    f.or(false) should be(false)
+  }
+
+  "class operator nand" should "output the correct logic" in {
+    t.nand(true) should be(false)
+    t.nand(false) should be(true)
+    f.nand(true) should be(true)
+    f.nand(false) should be(true)
+  }
+
+  "class operator nor" should "output the correct logic" in {
+    t.nor(true) should be(false)
+    t.nor(false) should be(false)
+    f.nor(true) should be(false)
+    f.nor(false) should be(true)
+  }
+
+  "class operator xor" should "output the correct logic" in {
+    f.xor(false) should be(false)
+    t.xor(true) should be(false)
+    t.xor(false) should be(true)
+    f.xor(true) should be(true)
+  }
+
+  "class operator impl" should "output the correct logic" in {
+    t.impl(true) should be(true)
+    f.impl(true) should be(true)
+    f.impl(false) should be(true)
+    t.impl(false) should be(false)
+  }
+
+  "class operator equ" should "output the correct logic" in {
+    t.equ(true) should be(true)
+    t.equ(false) should be(false)
+    f.equ(true) should be(false)
+    f.equ(false) should be(true)
+  }
+
+  val t = true
+  val f = false
 }
